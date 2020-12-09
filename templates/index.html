@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+     {{JSGlue.include()}}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://unpkg.com/ionicons@4.5.5/dist/ionicons.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/style.css')}}">
+    <title>Hello, world!</title>
+  </head>
+  <body>
+        <div class="container-fluid">
+            <div class="row">
+               <div class="col-lg-12" id="header" >
+                 <center><i class="fab fa-monero fa-5x" id="logo"></i></center>
+                 <!-- <textarea id="outbox" contenteditable="true"></textarea> -->
+               </div>
+             </div>
+        </div>
+        <div class="container-fluid">
+             <section id="first">              
+        <div class="row">
+              <div class="col-lg-6 nopadding" id="" >
+                <div id="wrap"> 
+                  <div id="art"><img src="{{ url }}"   id="imag">
+                    <textarea id="path"></textarea>
+                    </div>
+                  </div>
+                 
+              </div>
+
+              <div class="col-lg-6" id="" >
+                
+                <center><ion-icon name="logo-apple"></ion-icon><ion-icon name="logo-youtube"></ion-icon></center>
+
+
+        </div>
+        </div>
+         
+             </section>
+            </div>
+             <section id="second">
+      
+              <div class="container-fluid">
+                  <div class="row">
+                     <div class="col-lg-12" >
+                      <center>      
+                        <ion-icon name="download"></ion-icon>                    
+                        <ion-icon name="play" id="play" size="large"></ion-icon>
+                        <ion-icon name="add"></ion-icon>
+                        
+            </center>
+          </div>
+        </div>
+      </div>
+    
+       </section>
+
+        </div>
+           
+        </div>
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.sound.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    
+    <script type="text/javascript">
+        
+        //$('#header').click(function(){alert(navigator.clipboard.readText())});
+     //$('#imag').html({{ url }});   
+
+
+     async function paste()
+        {
+            text = await
+            navigator.clipboard.readText().then(text => $("#path").val(text));
+          
+             if($("#path").val()!=''){
+               aj();
+                 }
+             }
+      function aj()
+      {
+        $.ajax({
+
+            data:{
+              yt_url: $("#path").val()
+            },
+            type:"POST",
+            url:"/process",
+
+
+            })
+            .done(function(data){
+              if(data.apple_art!="")
+              {
+              $("#imag").attr("src",data.apple_art)
+              }
+              else{
+              $("#imag").attr("src",data.yt_art)
+              }
+              
+        
+              console.log(data);
+              console.log(data.file_name);
+
+              files= Flask.url_for('static',{"filename": "downloads/"+data.file_name});
+              console.log(files);
+              song1.stop();
+              song1.dispose();
+              loadSound(files,soundLoaded);
+              
+              
+            });
+      }
+             
+  var started = false;
+  var loaded=false;
+  var files;
+  var song1, analyzer;
+  var element;
+    function toggleSong(){
+     
+     if(song1.isPlaying()){
+
+       song1.pause();
+     }else{
+
+       song1.play();
+     }
+
+
+    }
+
+
+    function soundLoaded(song) {
+
+      console.log(song.url);
+      song1 = song;
+      loaded=true;
+      if(loaded==true){  
+      analyzer.setInput(song1);    
+      element.style('color','red');
+      //img= createImg('https://is3-ssl.mzstatic.com/image/thumb/Music/v4/56/4d/74/564d74d2-3564-886f-1af3-ea754413391c/source/600x600bb.jpg');
+      }
+    }
+  
+    function windowResized(){
+       
+      console.log('resized');
+      resizeCanvas(document.getElementById('wrap').offsetWidth,document.getElementById('wrap').offsetHeight);
+      console.log(document.getElementById('wrap').offsetWidth);
+    
+    } 
+    
+    function setup() {
+      var canvas=createCanvas(document.getElementById('wrap').offsetWidth, document.getElementById('wrap').offsetHeight);
+      // var x=(document.getElementById('wrap').offsetWidth-width);
+      // var y=(document.getElementById('wrap').offsetHeight-height);
+      song1 = loadSound(files,soundLoaded);
+                                                                        
+     // canvas.position(x,y);
+       canvas.parent('wrap');
+     //canvas.style('margin-right','-100px');
+     // canvas.style('margin','0px')
+     // canvas.style('z-index','-1');
+     element=select("#play");
+     
+      element.mouseClicked(function()
+      {
+        if(loaded==true){
+            if(song1.isPlaying()){
+            
+               element.removeAttribute("name");
+               element.attribute('name','play'); 
+
+               song1.pause();
+                 }else{
+                  element.removeAttribute("name");
+                  element.attribute('name','pause'); 
+                  song1.play();
+                 }
+        song1.onended(function(){element.removeAttribute("name");element.attribute('name','refresh');});
+        }
+       }
+      );
+     
+      song1.stop();
+      
+      //img=img.addClass("img");
+      // create a new Amplitude analyzer
+      analyzer = new p5.Amplitude();
+    
+      // Patch the input to an volume analyzer
+      analyzer.setInput(song1);
+      noLoop();
+
+    }
+    
+    function draw() {
+      if(started){
+      //background('rgba(255,255,255,0.01)');
+      clear();
+      // Get the average (root mean square) amplitude
+      //imag=img.addClass("img");
+      var rms = analyzer.getLevel();
+      fill(76,0,153,80);
+      noStroke();
+    
+      // Draw an ellipse with size based on volume
+      smooth();
+      ellipse((width+1)/2,height/2,250+rms*200, 250+rms*200);
+      //image(img,20, 20, 250, 250);
+      //console.log(rms);
+    }
+
+  }
+
+    function start(){
+      started = true;
+      loop();
+    }          
+    
+      
+
+ 
+     
+     
+     jQuery(document).ready(function(){
+     
+      $("#path").hide();
+      //  $("#path").val();
+       
+
+       
+
+        $("#art").click(
+            function()
+             {  //$('html[manifest=saveappoffline.appcache]').attr('content','');
+                start();
+                paste();
+
+              // var text=$("#path").val();;
+         });
+     });
+     
+
+             
+    </script>
+
+
+
+   </body>
+</html>
